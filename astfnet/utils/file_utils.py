@@ -6,9 +6,7 @@ import shutil
 from typing import List
 
 
-def extract_and_copy_files(
-    z_folder: str, t_folder: str, lst_file_paths: List[str], output_folders: List[str]
-) -> None:
+def extract_and_copy_files(z_folder: str, t_folder: str, lst_file_paths: List[str], output_folders: List[str]) -> None:
     """Extract and copy files from Z and T folders according to a 2:1 ratio.
 
     Ensures no duplicates and copies to target folders.
@@ -50,9 +48,7 @@ def extract_and_copy_files(
         s_files = random.sample(t_files, num_s)
 
         # Check for duplicates
-        while not len(p_files) == len(set(p_files)) or not len(s_files) == len(
-            set(s_files)
-        ):
+        while not len(p_files) == len(set(p_files)) or not len(s_files) == len(set(s_files)):
             print(f"Found duplicates, re-selecting files for {lst_file_path}")
             p_files = random.sample(z_files, num_p)
             s_files = random.sample(t_files, num_s)

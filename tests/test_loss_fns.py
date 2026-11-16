@@ -12,6 +12,7 @@ def test_weighted_mse() -> None:
     expected = (1.0 * ((0.0 + 1.0) / 2) + 2.0 * ((1.0 + 4.0) / 2)) / 2
     assert torch.isclose(loss, torch.tensor(expected)), f"Expected {expected}, got {loss.item()}"
 
+
 def test_amse_loss() -> None:
     """
     Unit test for AMSELoss (Amplitude + Phase Spectral Loss).
@@ -25,9 +26,9 @@ def test_amse_loss() -> None:
     x_pred = torch.tensor([[1.0, 0.0, -1.0, 0.0]])
     loss_fn = AMSELoss(fft_dim=-1, reduction="mean", eps=1e-12)
     loss_same = loss_fn(x_pred, x_true)
-    assert torch.allclose(
-        loss_same, torch.tensor(0.0), atol=1e-6
-    ), f"Expected 0 for identical signals, got {loss_same.item()}"
+    assert torch.allclose(loss_same, torch.tensor(0.0), atol=1e-6), (
+        f"Expected 0 for identical signals, got {loss_same.item()}"
+    )
 
     # Case 2: Amplitude mismatch → expect positive loss
     x_pred_amp = 2 * x_true

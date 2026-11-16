@@ -38,7 +38,7 @@ This information will appear in your commits.
 Clone the repository to your computer:
 
 ```bash
-git clone git@github.com:pangruncheng/ASTF-Net.git
+git clone https://github.com/OpenSeismoAI/ASTF-Net.git
 cd ASTF-Net
 ```
 
@@ -71,7 +71,7 @@ source .venv/bin/activate
 Install the package with development dependencies:
 
 ```bash
-uv sync --extra dev
+uv sync --frozen --extra dev
 ```
 
 This installs `astfnet` in editable mode, so local source code changes take effect without reinstalling the package. The development dependencies include tools such as `pre-commit`, `pytest`, `pytest-cov`, `ruff`, and `ty`.
@@ -227,11 +227,13 @@ Some hooks modify files automatically. If that happens, review the changes, add 
 
 ### 5.2 Install pre-commit
 
-If you installed the development environment with `uv sync --extra dev`, `pre-commit` and `ruff` are already available in your virtual environment. Otherwise, install `pre-commit` manually:
+If you installed the development environment with `uv sync --frozen --extra dev`, `pre-commit` and `ruff` are already available in your virtual environment. Otherwise, install the existing development dependencies from the repository root:
 
 ```bash
-uv add pre-commit
+uv sync --frozen --extra dev
 ```
+
+This uses the committed lockfile without changing `pyproject.toml` or `uv.lock`.
 
 Then install the hooks:
 
