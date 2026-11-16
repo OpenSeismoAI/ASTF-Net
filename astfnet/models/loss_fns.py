@@ -7,6 +7,7 @@ import torch.nn as nn
 
 logger = logging.getLogger(__name__)
 
+
 class WeightedMSE(nn.Module):
     """Weighted Mean Squared Error loss module."""
 
@@ -14,7 +15,9 @@ class WeightedMSE(nn.Module):
         """Initialize the WeightedMSE loss module."""
         super().__init__()
 
-    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor, weights: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(
+        self, y_pred: torch.Tensor, y_true: torch.Tensor, weights: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         """Calculate weighted mean squared error.
 
         Args:

@@ -104,17 +104,13 @@ def resample_waveform(input_waveform: Trace, target_sampling_rate: int = 100) ->
     current_sampling_rate = input_waveform.stats.sampling_rate
     target_sampling_interval = 1 / target_sampling_rate
     if current_sampling_rate != target_sampling_rate:
-        print(
-            f"Sampling rate {current_sampling_rate} Hz, resampled to {target_sampling_rate} Hz..."
-        )
+        print(f"Sampling rate {current_sampling_rate} Hz, resampled to {target_sampling_rate} Hz...")
         input_waveform = input_waveform.resample(target_sampling_rate)
         input_waveform.stats.sac.delta = target_sampling_interval
     return input_waveform
 
 
-def convolve_waveforms(
-    EGF_waveform: Trace, ASTF_waveform: Trace, start_time: int, end_time: int
-) -> np.ndarray:
+def convolve_waveforms(EGF_waveform: Trace, ASTF_waveform: Trace, start_time: int, end_time: int) -> np.ndarray:
     """Convolution operation: ASTF divided by M0 then convolved.
 
     Args:
@@ -154,9 +150,7 @@ def set_sac_header(trace: Trace, ASTF_waveform: Trace, EGF_waveform: Trace) -> N
     """
     trace.stats.network = EGF_waveform.stats.network  # Use EGF network name
     trace.stats.station = EGF_waveform.stats.station  # Use EGF station name
-    trace.stats.sac.kcmpnm = (
-        EGF_waveform.stats.sac.kcmpnm
-    )  # Set component to EGF component
+    trace.stats.sac.kcmpnm = EGF_waveform.stats.sac.kcmpnm  # Set component to EGF component
 
     # Set station and event coordinates
     trace.stats.sac.evla = EGF_waveform.stats.sac.evla  # Event latitude
@@ -172,9 +166,7 @@ def set_sac_header(trace: Trace, ASTF_waveform: Trace, EGF_waveform: Trace) -> N
     trace.stats.sac.user2 = ASTF_waveform.stats.sac.user2  # Length
     trace.stats.sac.user3 = ASTF_waveform.stats.sac.user3  # Width
     trace.stats.sac.user4 = ASTF_waveform.stats.sac.user4  # Rupture start point
-    trace.stats.sac.user5 = (
-        ASTF_waveform.stats.sac.user5
-    )  # Angle between ellipse major axis and strike
+    trace.stats.sac.user5 = ASTF_waveform.stats.sac.user5  # Angle between ellipse major axis and strike
 
     # Sampling frequency and start time
     trace.stats.sampling_rate = ASTF_waveform.stats.sampling_rate  # Sampling frequency
