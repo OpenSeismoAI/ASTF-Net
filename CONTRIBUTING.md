@@ -51,7 +51,16 @@ git checkout dev
 git pull origin dev
 ```
 
-If this repository uses `main` instead of `dev`, replace `dev` with `main`.
+`dev` is the integration branch; `main` is the stable release branch.
+Create feature and fix branches from the latest `dev`, then open a Pull Request
+targeting `dev`. After review and successful CI checks, maintainers merge the
+change into `dev`. Validated changes are promoted from `dev` to `main` through
+a separate Pull Request.
+
+CI runs on pushes to `dev` and `main`, and on Pull Requests targeting either
+branch. Maintainers should configure branch protection for both branches to
+require Pull Request review and the CI `build` check before merging. Branch
+protection is a GitHub repository setting and is not enabled by this workflow.
 
 ### 2.4 Install the development environment
 
@@ -166,7 +175,7 @@ final version
 git push origin feature/your-feature-name
 ```
 
-Then open a Pull Request on GitHub.
+Then open a Pull Request on GitHub with `dev` as the base branch.
 
 ---
 
