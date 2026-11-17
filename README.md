@@ -109,3 +109,15 @@ More information on the usage and the options available for these entry points c
 ```bash
 astfnet-train --help
 ```
+
+### Reproducible training
+
+Training defaults to seed 42, deterministic algorithms and disabled cuDNN
+benchmarking. Set `seed`, `deterministic` and `benchmark` in the YAML config,
+or override the seed and deterministic mode with `--seed` and
+`--deterministic` / `--no-deterministic`.
+
+Each run records resolved settings, source and environment information, actual
+dataset SHA-256 checksums, metrics and checkpoint paths beside its TensorBoard
+logs. See [Reproducibility](docs/reproducibility.md) for the CPU reference command,
+measured smoke-test metrics, output locations and determinism limits.
