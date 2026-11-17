@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import sys
+from pathlib import Path
 from typing import Dict
 
 import pytorch_lightning as pl
@@ -24,9 +25,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Train ASTF-net with PyTorch Lightning.")
     parser.add_argument(
         "--config",
-        type=str,
-        default="config/config.yaml",
-        help="Path to config YAML file",
+        type=Path,
+        default=Path(__file__).resolve().parents[1] / "config-simplecnn.yaml",
+        help="Path to config YAML file (default: bundled SimpleCNN configuration)",
     )
     parser.add_argument(
         "--data",
@@ -43,6 +44,8 @@ def main() -> None:
     args = parser.parse_args()
 
     # Load config
+    if not args.config.is_file():
+        parser.error(f"Config file not found: {args.config}")
     config: Dict = dict(OmegaConf.load(args.config))
 
     # Resolve canonical data file paths from --data CLI argument

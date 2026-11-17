@@ -100,7 +100,16 @@ Installing the application with uv sync exposes the following CLI entry points:
 ```
 astfnet-train               # train a model
 ```
-The entry points can be called directly. For example:
+The entry points can be called directly. Without `--config`, training uses the
+SimpleCNN configuration bundled with the installed package, matching
+`config/config-simplecnn.yaml`. This default works from any working directory,
+including after installing a wheel:
+```bash
+astfnet-train --data /path/to/data/
+```
+
+To use a custom configuration, pass its path explicitly. Relative configuration
+paths are resolved from your current working directory:
 ```bash
 astfnet-train --config config/config-simplecnn.yaml --data /path/to/data/
 ```

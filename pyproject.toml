@@ -45,6 +45,9 @@ astfnet-train="astfnet.cli.train:main"
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.package-data]
+astfnet = ["config-simplecnn.yaml"]
+
 [tool.setuptools.packages.find]
 where = ["."]
 
