@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import Dict
+from typing import Any, cast
 
 import pytorch_lightning as pl
 from omegaconf import OmegaConf
@@ -14,6 +14,7 @@ from astfnet.data_io.datamodule import SeismicDataModule
 from astfnet.models import ASTFModule
 from astfnet.models.optimizer import OptimizerFactory
 from astfnet.models.scheduler import SchedulerFactory
+from astfnet.reproducibility import RunManifest, configure_reproducibility
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +41,27 @@ def main() -> None:
         default=False,
         help="Skip test-set evaluation after training",
     )
+    parser.add_argument("--seed", type=int, default=None, help="Override the config seed (default: 42)")
+    parser.add_argument(
+        "--deterministic",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Override deterministic trainer algorithms (default: enabled)",
+    )
+    parser.add_argument("--dataset-revision", default=None, help="Declare the source dataset revision for the manifest")
     args = parser.parse_args()
 
     # Load config
-    config: Dict = dict(OmegaConf.load(args.config))
+    loaded_config = OmegaConf.to_container(OmegaConf.load(args.config), resolve=True)
+    if not isinstance(loaded_config, dict):
+        parser.error("Config must be a YAML mapping")
+    config = cast(dict[str, Any], loaded_config)
+    if args.dataset_revision is not None:
+        config["dataset_revision"] = args.dataset_revision
+    try:
+        configure_reproducibility(config, args.seed, args.deterministic)
+    except ValueError as error:
+        parser.error(str(error))
 
     # Resolve canonical data file paths from --data CLI argument
     data_path = args.data
@@ -109,10 +127,12 @@ def main() -> None:
         max_epochs=max_epochs,
         accelerator=device,
         devices=gpus,
+        deterministic=config["deterministic"],
+        benchmark=config["benchmark"],
         default_root_dir="outputs",
         log_every_n_steps=10,
         logger=tb_logger,
-        callbacks=[early_stop_callback, lr_monitor, checkpoint_callback],
+        callbacks=[early_stop_callback, lr_monitor, checkpoint_callback, RunManifest(config, resolved, args.skip_test)],
     )
 
     logger.info("Starting training...")

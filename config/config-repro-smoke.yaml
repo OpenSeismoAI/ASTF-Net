@@ -1,0 +1,37 @@
+# Engineering smoke reference on generated data, not a HiASTF accuracy benchmark.
+seed: 42
+deterministic: true
+benchmark: false
+dataset_revision: "synthetic-gaussian-convolution-v1-seed20261117"
+tb_output_dir: "outputs/repro-smoke"
+tb_exp_name: "cpu"
+batch_size: 4
+num_workers: 1
+log_normalize_astf: false
+log_normalize_input: false
+augmentations:
+  - AddRandomNoise:
+      noise_level: 0.1
+max_augmentations: 1
+model_name: "simplecnn"
+in_channels: 2
+output_length: 32
+max_epochs: 2
+device: "cpu"
+gpus: 1
+loss: "mse"
+optimizer:
+  name: Adam
+  lr: 0.0001
+callbacks:
+  early_stopping:
+    monitor: "val/loss_epoch"
+    mode: "min"
+    patience: 20
+    min_delta: 0.0
+    verbose: false
+  model_checkpoint:
+    monitor: "val/loss_epoch"
+    mode: "min"
+    save_top_k: 1
+    filename: "best-{epoch:02d}"
