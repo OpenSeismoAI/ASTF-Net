@@ -109,3 +109,41 @@ More information on the usage and the options available for these entry points c
 ```bash
 astfnet-train --help
 ```
+
+### Slurm training
+
+Prepare the project environment on the shared filesystem before submitting a
+job. `uv sync --frozen` installs the Python 3.12.10 environment required by
+`pyproject.toml`; it must also be accessible from the compute node.
+
+From the repository root:
+
+```bash
+uv sync --frozen
+mkdir -p logs
+sbatch --chdir="$PWD" --partition=YOUR_GPU_PARTITION \
+  --output="$PWD/logs/%x__%j.log" \
+  job.sh /path/to/data config/config-simplecnn.yaml
+```
+
+Replace the partition and data path for your cluster. The example requests one
+GPU, 16 CPUs, 128 GB of memory and three hours; override these with `sbatch`
+options when needed. `--chdir` must point to the repository root, where `.venv`
+and repository-relative configuration paths are resolved. Data and configuration
+paths may also be absolute, and paths containing spaces must be quoted.
+
+The script accepts `DATA_DIR [CONFIG_YAML [TRAIN_OPTIONS...]]`. Omitting the
+configuration keeps the existing Transformer configuration as the default.
+To skip evaluation, for example, append `--skip-test` after an explicit config:
+
+```bash
+sbatch --chdir="$PWD" --partition=YOUR_GPU_PARTITION \
+  job.sh /path/to/data config/config-simplecnn.yaml --skip-test
+```
+
+The launcher checks the data directory, configuration file, project environment
+and Python version before starting training. Without an `--output` override,
+both output streams go to `astfnet-train__JOBID.log` in the working directory.
+Create a custom log directory **before** `sbatch`, as above: Slurm opens the log
+before the script can run. See the [Slurm sbatch documentation](https://slurm.schedmd.com/sbatch.html)
+for cluster options and output handling.
