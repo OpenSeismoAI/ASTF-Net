@@ -109,3 +109,16 @@ More information on the usage and the options available for these entry points c
 ```bash
 astfnet-train --help
 ```
+
+### Prediction
+
+Run an explicit trained checkpoint on the three test levels, or use `--input`
+for paired HDF5 files without requiring ASTF labels:
+
+```bash
+uv run --frozen astfnet-predict --checkpoint /path/to/best.ckpt \
+  --data /path/to/data --output-dir outputs/predictions --device cpu --dt 0.01
+```
+
+See [Checkpoint inference](docs/inference.md) for preprocessing, supported
+checkpoint formats, time intervals and saved prediction datasets.

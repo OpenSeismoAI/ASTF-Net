@@ -12,6 +12,16 @@ from astfnet.data_io.augmentation import load_augmenter
 EPSILON_FOR_LOG = 1.0
 
 
+def signed_log_normalize(x: torch.Tensor, epsilon: float = EPSILON_FOR_LOG) -> torch.Tensor:
+    """Apply the training input transform without changing tensor device or dtype."""
+    return torch.sign(x) * torch.log(torch.abs(x) + epsilon)
+
+
+def signed_log_inverse(x: torch.Tensor) -> torch.Tensor:
+    """Invert the signed-log transform with the training epsilon of one."""
+    return torch.sign(x) * torch.expm1(torch.abs(x))
+
+
 class SeismicDatasetHDF5(Dataset):
     """Dataset class for loading seismic data from HDF5 files."""
 
@@ -46,7 +56,7 @@ class SeismicDatasetHDF5(Dataset):
 
     def log_normalize(self, x: torch.Tensor) -> torch.Tensor:
         """Signed log normalization."""
-        return torch.sign(x) * torch.log(torch.abs(x) + self.epsilon)
+        return signed_log_normalize(x, self.epsilon)
 
     def __len__(self: "SeismicDatasetHDF5") -> int:
         """Return dataset length."""
