@@ -41,6 +41,7 @@ dev = [
 
 [project.scripts]
 astfnet-train="astfnet.cli.train:main"
+astfnet-predict="astfnet.cli.predict:main"
 
 [tool.setuptools]
 include-package-data = true
