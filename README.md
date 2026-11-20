@@ -122,3 +122,7 @@ uv run --frozen astfnet-predict --checkpoint /path/to/best.ckpt \
 
 See [Checkpoint inference](docs/inference.md) for preprocessing, supported
 checkpoint formats, time intervals and saved prediction datasets.
+
+`--plot-summary` saves waveform examples and a 2×3 duration and CC figure for
+three labeled test levels. `astfnet-plot-predictions` redraws saved results
+without repeating inference. See the guide for the plot formats and metrics.

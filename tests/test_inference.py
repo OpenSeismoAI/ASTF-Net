@@ -100,6 +100,9 @@ def test_unlabeled_and_cli(tmp_path: Path) -> None:
             "cpu",
             "--dt",
             "0.01",
+            "--plot-summary",
+            "--plot-dpi",
+            "35",
         ],
         capture_output=True,
         text=True,
@@ -110,6 +113,8 @@ def test_unlabeled_and_cli(tmp_path: Path) -> None:
         assert "actual" not in stream
         assert stream["predicted"].shape == (5, 16)
         assert stream.attrs["dt"] == 0.01 and stream.attrs["dt_source"] == "CLI"
+    assert (tmp_path / "export/plots/examples_column_1.pdf").exists()
+    assert not (tmp_path / "export/plots/duration_cc_combined_2x3.pdf").exists()
 
 
 @pytest.mark.parametrize("problem", ["nonfinite", "unpaired", "label_length", "batch_size"])
@@ -138,3 +143,37 @@ def test_incompatible_checkpoint_is_rejected(tmp_path: Path) -> None:
     OmegaConf.save(config, config_path)
     with pytest.raises(RuntimeError, match="size mismatch"):
         load_inference_model(checkpoint, config_path)
+
+
+def test_three_level_prediction_with_plot_summary(tmp_path: Path) -> None:
+    checkpoint, _, source, _, _ = make_case(tmp_path)
+    paths = []
+    for level in (1, 2, 3):
+        path = tmp_path / f"test_level_{level}.h5"
+        path.write_bytes(source.read_bytes())
+        paths.append(path)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "astfnet.cli.predict",
+            "--checkpoint",
+            str(checkpoint),
+            "--input",
+            *map(str, paths),
+            "--output-dir",
+            str(tmp_path / "export"),
+            "--plot-summary",
+            "--plot-dpi",
+            "35",
+            "--batch-size",
+            "2",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    summaries = json.loads((tmp_path / "export/plots/metrics_summary.json").read_text())
+    assert [item["sample_count"] for item in summaries] == [5, 5, 5]
+    assert (tmp_path / "export/plots/duration_cc_combined_2x3.pdf").exists()
