@@ -42,6 +42,7 @@ dev = [
 [project.scripts]
 astfnet-train="astfnet.cli.train:main"
 astfnet-predict="astfnet.cli.predict:main"
+astfnet-plot-predictions="astfnet.cli.plot_predictions:main"
 
 [tool.setuptools]
 include-package-data = true

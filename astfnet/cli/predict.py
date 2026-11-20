@@ -19,6 +19,10 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--device", default="cpu", help="cpu (default), cuda, cuda:INDEX, or auto")
     parser.add_argument("--dt", type=float, help="Sample interval in seconds; otherwise read the input dt attribute")
+    parser.add_argument(
+        "--plot-summary", action="store_true", help="Render examples and a 2×3 summary for three labeled levels"
+    )
+    parser.add_argument("--plot-dpi", type=int, default=600)
     args = parser.parse_args()
     paths = (
         [Path(path) for path in resolve_data_paths(str(args.data))["test_hdf5_files"]]
@@ -31,14 +35,26 @@ def main() -> None:
         if len({path.stem for path in paths}) != len(paths):
             raise ValueError("Input filenames must have distinct stems to avoid output collisions")
         outputs = [args.output_dir / f"{path.stem}_predictions.h5" for path in paths]
+        if args.plot_summary and args.plot_dpi <= 0:
+            raise ValueError("--plot-summary requires positive --plot-dpi")
         for path, output in zip(paths, outputs):
-            inspect_input(path, args.dt)
+            metadata = inspect_input(path, args.dt)
+            if args.plot_summary and metadata["dt"] is None:
+                raise ValueError("--plot-summary requires a known dt for every input")
             if output.exists():
                 raise FileExistsError(f"Output already exists: {output}")
         model, config = load_inference_model(args.checkpoint, args.config, args.device)
         for path, output in zip(paths, outputs):
             predict_hdf5(model, config, path, output, args.checkpoint, args.batch_size, args.dt)
             print(f"Predictions saved: {output}")
+        if args.plot_summary:
+            import matplotlib
+
+            matplotlib.use("Agg")
+            from astfnet.prediction_plots import plot_prediction_report
+
+            plot_prediction_report(outputs, args.output_dir / "plots", dpi=args.plot_dpi)
+            print(f"Plots saved: {args.output_dir / 'plots'}")
     except (OSError, ValueError, RuntimeError, KeyError, TypeError) as error:
         parser.error(str(error))
 
