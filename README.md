@@ -2,6 +2,8 @@
 
 ASTF-net is an open-source deep learning framework designed for apparent seismic source time function inversion.
 
+Start with the [training quickstart](docs/quickstart.md) to prepare HiASTF, run a short CPU training job, and find its checkpoints.
+
 # Data
 ![ASTF-net Logo](https://github.com/user-attachments/assets/c7c4a6e9-006a-447b-b697-31ed34e42424)
 
